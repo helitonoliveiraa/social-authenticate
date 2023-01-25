@@ -3,6 +3,7 @@ import { OAuth2Client } from 'google-auth-library';
 
 import { UserService } from '../services/UserService';
 import { getGoogleOAuthTokens } from "../utils/getGoogleOAuthTokens";
+import { setIntoRedis } from "../utils/redis.config";
 
 
 export class AuthService {
@@ -17,12 +18,15 @@ export class AuthService {
     );
   }
 
-  async execute(code: string) {
+  async execute(token: string) {
     try {
-      const { id_token } = await getGoogleOAuthTokens({ code });
+      // const { id_token } = await getGoogleOAuthTokens({ code });
+// 
+      // console.log({ id_token });
 
-      const ticket = await this.googleService.verifyIdToken({ idToken: id_token });
+      const ticket = await this.googleService.verifyIdToken({ idToken: token });
       // const user = await getGoogleUser({ access_token, id_token });
+      console.log('Get from database!');
 
       const payload = ticket.getPayload();
 
@@ -40,22 +44,24 @@ export class AuthService {
         });
       }
 
-      const token = jwt.sign(
-        {
-          user: {
-            name: user.name,
-            avatar_url: user.avatar_url,
-            id: user.id,
-          }
-        },
-        process.env.JWT_SECRET,
-        {
-          subject: user.id,
-          expiresIn: '1d'
-        }
-      );
+      // const token = jwt.sign(
+      //   {
+      //     user: {
+      //       name: user.name,
+      //       avatar_url: user.avatar_url,
+      //       id: user.id,
+      //     }
+      //   },
+      //   process.env.JWT_SECRET,
+      //   {
+      //     subject: user.id,
+      //     expiresIn: '1d'
+      //   }
+      // );
 
-      return { token, payload, user };
+      // await setIntoRedis(`user-${user.id}`, JSON.stringify(user))
+
+      return { user, payload };
     } catch (err) {
       console.log(err);
     }

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/UserService";
+import { updateUserValidate } from '../validations';
 
 export class UserController {
   private userService: UserService;
@@ -28,7 +29,9 @@ export class UserController {
 
   async update(request: Request, response: Response) {
     const { id } = request.params;
-    const { name, avatarUrl, admin } = request.body;
+    const { name, avatarUrl, admin } = updateUserValidate.parse(request.body);
+
+    console.log({ name, avatarUrl, admin });
 
     const user = await this.userService.update({
       id, 

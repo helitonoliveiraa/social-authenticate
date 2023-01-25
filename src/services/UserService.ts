@@ -37,29 +37,29 @@ export class UserService extends BaseService {
   }
 
   async update({ name, avatar_url, id, admin }: Update) {
-    let data: Omit<Update, 'id'> = {};
+    // let data: Omit<Update, 'id'> = {};
 
-    if (name && name.length > 0) {
-      data.name = name;
-    }
+    // if (name && name.length > 0) {
+    //   data.name = name;
+    // }
 
-    if (avatar_url && avatar_url.length > 5) {
-      data.avatar_url = avatar_url;
-    }
+    // if (avatar_url && avatar_url.length > 5) {
+    //   data.avatar_url = avatar_url;
+    // }
 
-    if (admin) {
-      data.admin = admin;
-    }
-
-    if (!data) {
-      throw new Error('Do not update for empty data!');
-    }
+    // if (!data) {
+    //   throw new Error('Do not update for empty data!');
+    // }
 
     return await this.client.user.update({
       where: {
         id,
       },
-      data,
+      data: {
+        admin,
+        avatar_url,
+        name
+      }
     })
   }
 
