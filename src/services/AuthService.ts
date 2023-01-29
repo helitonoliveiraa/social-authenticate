@@ -20,13 +20,7 @@ export class AuthService {
 
   async execute(token: string) {
     try {
-      // const { id_token } = await getGoogleOAuthTokens({ code });
-// 
-      // console.log({ id_token });
-
       const ticket = await this.googleService.verifyIdToken({ idToken: token });
-      // const user = await getGoogleUser({ access_token, id_token });
-      console.log('Get from database!');
 
       const payload = ticket.getPayload();
 
@@ -37,31 +31,16 @@ export class AuthService {
       let user = await this.userService.findByEmail(payload.email);
 
       if (!user) {
-        user = await this.userService.create({
-          avatar_url: payload.picture || '',
-          email: payload.email,
-          name: payload.name || '',
-        });
+        return 'User already registered!'
       }
 
-      // const token = jwt.sign(
-      //   {
-      //     user: {
-      //       name: user.name,
-      //       avatar_url: user.avatar_url,
-      //       id: user.id,
-      //     }
-      //   },
-      //   process.env.JWT_SECRET,
-      //   {
-      //     subject: user.id,
-      //     expiresIn: '1d'
-      //   }
-      // );
+      user = await this.userService.register({
+        avatar_url: payload.picture || '',
+        email: payload.email,
+        name: payload.name || '',
+      });
 
-      // await setIntoRedis(`user-${user.id}`, JSON.stringify(user))
-
-      return { user, payload };
+      return { user };
     } catch (err) {
       console.log(err);
     }

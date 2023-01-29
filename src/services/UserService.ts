@@ -14,12 +14,12 @@ export class UserService extends BaseService {
     super();
   }
 
-  async create({ email, name, avatar_url }: CreateUserDTO): Promise<User> {
+  async register({ email, name, avatar_url }: CreateUserDTO): Promise<User> {
     return await this.client.user.create({
       data: {
         name,
         email,
-        avatar_url,
+        avatar_url: avatar_url || '',
       }
     });
   }
