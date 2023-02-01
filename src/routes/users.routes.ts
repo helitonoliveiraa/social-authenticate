@@ -1,16 +1,14 @@
 import { Router } from 'express';
-import { RegisterController } from '../controllers/RegisterController';
 import { UserController } from '../controllers/UserController';
+import { SessionController } from '../controllers/SessionController';
 import { authCache, ensureAuthenticate } from '../middlewares';
 
 const router = Router();
 
-const registerController = new RegisterController();
 const userController = new UserController();
+const sessionController = new SessionController();
 
-router.post('/register', (request, response) => registerController.register(request, response));
-
-router.post('/authenticate', ensureAuthenticate, (request, response) => userController.get(request, response));
+router.post('/session', ensureAuthenticate, (request, response) => sessionController.create(request, response));
 
 router.get('/users', ensureAuthenticate, (request, response) => userController.getAll(request, response));
 router.get('/profile/:id', ensureAuthenticate, (request, response) => userController.getId(request, response));

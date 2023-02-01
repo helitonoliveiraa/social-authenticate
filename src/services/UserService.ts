@@ -14,8 +14,8 @@ export class UserService extends BaseService {
     super();
   }
 
-  async register({ email, name, avatar_url }: CreateUserDTO): Promise<User> {
-    return await this.client.user.create({
+  register({ email, name, avatar_url }: CreateUserDTO): Promise<User> {
+    return this.client.user.create({
       data: {
         name,
         email,

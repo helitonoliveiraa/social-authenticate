@@ -1,10 +1,6 @@
-import jwt from "jsonwebtoken";
 import { OAuth2Client } from 'google-auth-library';
 
 import { UserService } from '../services/UserService';
-import { getGoogleOAuthTokens } from "../utils/getGoogleOAuthTokens";
-import { setIntoRedis } from "../utils/redis.config";
-
 
 export class AuthService {
   private googleService: OAuth2Client;
@@ -23,22 +19,23 @@ export class AuthService {
       const ticket = await this.googleService.verifyIdToken({ idToken: token });
 
       const payload = ticket.getPayload();
-
       if (!payload?.email) {
         throw new Error('Error getting user payload.');
       }
 
-      let user = await this.userService.findByEmail(payload.email);
-
-      if (!user) {
-        return 'User already registered!'
+      const exists = await this.userService.findByEmail(payload.email);
+      if (exists) {
+        throw new Error('User already exists!');
       }
 
-      user = await this.userService.register({
+      const user = await this.userService.register({
         avatar_url: payload.picture || '',
         email: payload.email,
         name: payload.name || '',
       });
+      if (!user) {
+        throw new Error('User created failed.');
+      }
 
       return { user };
     } catch (err) {
