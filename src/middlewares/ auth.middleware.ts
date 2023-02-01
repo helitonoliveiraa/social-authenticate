@@ -1,9 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import Redis from 'ioredis';
-import { getFromRedis, setIntoRedis } from '../utils/redis.config';
-
-const redis = new Redis();
+import { Cache } from '../lib/Cache';
 
 export async function ensureAuthenticate(request: Request, response: Response, next: NextFunction) {
   const { authorization } = request.headers;
@@ -14,22 +10,18 @@ export async function ensureAuthenticate(request: Request, response: Response, n
     });
   }
 
+  const redis = new Cache();
+
   const [, token] = authorization.split(' ');
+  
+  const exists = await redis.getToken(token);
+  if (exists) {
+    return next();
+  }
 
   try {
-    const exists = await getFromRedis(token);
+    await redis.setToken(token, token);
 
-    if (exists) {
-      request.token = token;
-
-      console.log('get from redis :)');
-
-      return next();
-    }
-    
-    await setIntoRedis(token, token);
-    request.token = token;
-    
     return next();
   } catch (err: any) {
     return response.status(401).json({
