@@ -9,5 +9,7 @@ declare namespace NodeJS {
     APIS_USERINFO_PROFILE: string;
     APIS_USERINFO_EMAIL: string;
     UI_ROOT_URI: string;
+    REDIS_HOST: string;
+    REDIS_PORT: number;
   }
 }
